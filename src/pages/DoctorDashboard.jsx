@@ -21,6 +21,11 @@ export default function DoctorDashboard() {
   const [availability, setAvailability] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("appointments");
+  const [editProfile, setEditProfile] = useState({
+    specialty: "", bio: "", experience_years: "", consultation_fee: ""
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+const [profileMsg, setProfileMsg] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [updatingId, setUpdatingId] = useState(null);
   const [availSaving, setAvailSaving] = useState(false);
@@ -33,6 +38,7 @@ export default function DoctorDashboard() {
   }, []);
 
   const fetchAll = async () => {
+    setLoading(true);
     try {
       const [apptRes, profileRes, availRes] = await Promise.all([
         API.get("/doctor/appointments"),
@@ -42,10 +48,30 @@ export default function DoctorDashboard() {
       setAppointments(apptRes.data);
       setProfile(profileRes.data);
       setAvailability(availRes.data);
+      setEditProfile({
+        specialty: profileRes.data.specialty || "",
+        bio: profileRes.data.bio || "",
+        experience_years: profileRes.data.experience_years || "",
+        consultation_fee: profileRes.data.consultation_fee || "",
+      });
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveProfile = async () => {
+    setSavingProfile(true);
+    setProfileMsg("");
+    try {
+      await API.put("/doctor/profile", editProfile);
+      setProfileMsg("✅ Profile updated successfully!");
+      fetchAll();
+    } catch (err) {
+      setProfileMsg("❌ Failed to update profile.");
+    } finally {
+      setSavingProfile(false);
     }
   };
 
@@ -190,22 +216,22 @@ export default function DoctorDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-3 mb-8">
-          {["appointments", "availability", "profile"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className="px-5 py-2 rounded-xl text-sm font-semibold transition capitalize"
-              style={{
-                backgroundColor: activeTab === tab ? "#1A6B72" : "#ffffff",
-                color: activeTab === tab ? "#ffffff" : "#718096",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              {tab === "appointments" ? "📋 Appointments" : tab === "availability" ? "🗓 Availability" : "👤 Profile"}
-            </button>
-          ))}
-        </div>
+        <div className="flex gap-3 mb-6">
+  {["appointments", "availability", "profile"].map((tab) => (
+    <button
+      key={tab}
+      onClick={() => setActiveTab(tab)}
+      className="px-5 py-2 rounded-xl text-sm font-semibold transition capitalize"
+      style={{
+        backgroundColor: activeTab === tab ? "#1A6B72" : "#ffffff",
+        color: activeTab === tab ? "#ffffff" : "#718096",
+        border: "1px solid #e2e8f0",
+      }}
+    >
+      {tab === "appointments" ? "📋 Appointments" : tab === "availability" ? "🗓️ My Availability" : "👤 Edit Profile"}
+    </button>
+  ))}
+</div>
 
         {/* ── APPOINTMENTS TAB ── */}
         {activeTab === "appointments" && (
@@ -396,40 +422,103 @@ export default function DoctorDashboard() {
           </div>
         )}
 
-        {/* ── PROFILE TAB ── */}
-        {activeTab === "profile" && (
-          <div
-            className="rounded-2xl p-8"
-            style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}
-          >
-            <h3 className="font-bold text-lg mb-6" style={{ color: "#2D3748" }}>Your Profile</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {[
-                { label: "Full Name", value: profile?.name },
-                { label: "Email", value: profile?.email },
-                { label: "Phone", value: profile?.phone || "Not set" },
-                { label: "Specialty", value: profile?.specialty },
-                { label: "Experience", value: `${profile?.experience_years} years` },
-                { label: "Consultation Fee", value: `$${parseFloat(profile?.consultation_fee || 0).toFixed(2)}` },
-                { label: "Rating", value: `${parseFloat(profile?.rating || 0).toFixed(1)} ⭐ (${profile?.total_reviews} reviews)` },
-                { label: "Status", value: profile?.is_approved ? "✅ Approved" : "⏳ Pending Approval" },
-              ].map((item) => (
-                <div key={item.label}>
-                  <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "#A0AEC0" }}>
-                    {item.label}
-                  </p>
-                  <p className="font-semibold" style={{ color: "#2D3748" }}>{item.value}</p>
-                </div>
-              ))}
-            </div>
-            {profile?.bio && (
-              <div className="mt-6">
-                <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "#A0AEC0" }}>Bio</p>
-                <p style={{ color: "#4A5568" }}>{profile.bio}</p>
-              </div>
-            )}
-          </div>
-        )}
+     {/* Profile Tab */}
+{activeTab === "profile" && (
+  <div
+    className="rounded-2xl p-8"
+    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}
+  >
+    <h3 className="font-bold text-lg mb-2" style={{ color: "#2D3748" }}>
+      Edit Your Profile
+    </h3>
+    <p className="text-sm mb-6" style={{ color: "#718096" }}>
+      Update your professional information visible to patients.
+    </p>
+
+    <div className="flex flex-col gap-4 max-w-lg">
+      <div>
+        <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Specialty</label>
+        <select
+          value={editProfile.specialty}
+          onChange={e => setEditProfile({ ...editProfile, specialty: e.target.value })}
+          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+          style={{ border: "1px solid #e2e8f0", backgroundColor: "#F7F9FA", color: "#2D3748" }}
+        >
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Dentistry</option>
+          <option>Ophthalmology</option>
+          <option>Orthopedics</option>
+          <option>Pediatrics</option>
+          <option>General</option>
+          <option>Dermatology</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Years of Experience</label>
+        <input
+          type="number"
+          value={editProfile.experience_years}
+          onChange={e => setEditProfile({ ...editProfile, experience_years: e.target.value })}
+          placeholder="e.g. 5"
+          min="0"
+          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+          style={{ border: "1px solid #e2e8f0", backgroundColor: "#F7F9FA", color: "#2D3748" }}
+          onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+          onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Consultation Fee ($)</label>
+        <input
+          type="number"
+          value={editProfile.consultation_fee}
+          onChange={e => setEditProfile({ ...editProfile, consultation_fee: e.target.value })}
+          placeholder="e.g. 100"
+          min="0"
+          className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+          style={{ border: "1px solid #e2e8f0", backgroundColor: "#F7F9FA", color: "#2D3748" }}
+          onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+          onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+        />
+      </div>
+
+      <div>
+        <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Bio</label>
+        <textarea
+          value={editProfile.bio}
+          onChange={e => setEditProfile({ ...editProfile, bio: e.target.value })}
+          placeholder="Describe your experience and expertise..."
+          rows={4}
+          className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
+          style={{ border: "1px solid #e2e8f0", backgroundColor: "#F7F9FA", color: "#2D3748" }}
+          onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+          onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+        />
+      </div>
+
+      {profileMsg && (
+        <p
+          className="text-sm font-semibold"
+          style={{ color: profileMsg.includes("✅") ? "#276749" : "#C53030" }}
+        >
+          {profileMsg}
+        </p>
+      )}
+
+      <button
+        onClick={saveProfile}
+        disabled={savingProfile}
+        className="px-8 py-3 rounded-xl text-white font-semibold text-sm transition hover:opacity-90 w-fit"
+        style={{ backgroundColor: savingProfile ? "#A0AEC0" : "#E8734A" }}
+      >
+        {savingProfile ? "Saving..." : "Save Profile"}
+      </button>
+    </div>
+  </div>
+)}
 
       </div>
     </div>

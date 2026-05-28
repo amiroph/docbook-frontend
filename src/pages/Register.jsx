@@ -13,6 +13,9 @@ export default function Register() {
     role: "patient",
     phone: "",
     specialty: "",
+    experience_years: "",
+    consultation_fee: "",
+    bio: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -167,32 +170,86 @@ export default function Register() {
               />
             </div>
 
-            {/* Doctor only */}
-            {form.role === "doctor" && (
-              <div>
-                <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Specialty</label>
-                <select
-                  name="specialty"
-                  value={form.specialty}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={inputStyle}
-                  onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
-                  onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
-                >
-                  <option value="">Select specialty...</option>
-                  <option>Cardiology</option>
-                  <option>Neurology</option>
-                  <option>Dentistry</option>
-                  <option>Ophthalmology</option>
-                  <option>Orthopedics</option>
-                  <option>Pediatrics</option>
-                  <option>General</option>
-                  <option>Dermatology</option>
-                </select>
-              </div>
-            )}
+           {/* Doctor only fields */}
+{form.role === "doctor" && (
+  <>
+    <div>
+      <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Specialty</label>
+      <select
+        name="specialty"
+        value={form.specialty}
+        onChange={handleChange}
+        required
+        className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+        style={inputStyle}
+        onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+        onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+      >
+        <option value="">Select specialty...</option>
+        <option>Cardiology</option>
+        <option>Neurology</option>
+        <option>Dentistry</option>
+        <option>Ophthalmology</option>
+        <option>Orthopedics</option>
+        <option>Pediatrics</option>
+        <option>General</option>
+        <option>Dermatology</option>
+      </select>
+    </div>
+
+    <div>
+      <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Years of Experience</label>
+      <input
+        type="number"
+        name="experience_years"
+        value={form.experience_years}
+        onChange={handleChange}
+        placeholder="e.g. 5"
+        min="0"
+        max="50"
+        required
+        className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+        style={inputStyle}
+        onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+        onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+      />
+    </div>
+
+    <div>
+      <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Consultation Fee ($)</label>
+      <input
+        type="number"
+        name="consultation_fee"
+        value={form.consultation_fee}
+        onChange={handleChange}
+        placeholder="e.g. 100"
+        min="0"
+        required
+        className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+        style={inputStyle}
+        onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+        onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+      />
+    </div>
+
+    <div>
+      <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>
+        Bio <span style={{ color: "#A0AEC0", fontWeight: 400 }}>(optional)</span>
+      </label>
+      <textarea
+        name="bio"
+        value={form.bio}
+        onChange={handleChange}
+        placeholder="Brief description of your experience and expertise..."
+        rows={3}
+        className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
+        style={inputStyle}
+        onFocus={e => e.target.style.border = "1.5px solid #1A6B72"}
+        onBlur={e => e.target.style.border = "1px solid #e2e8f0"}
+      />
+    </div>
+  </>
+)}
 
             <div>
               <label className="text-sm font-semibold block mb-1" style={{ color: "#2D3748" }}>Password</label>
