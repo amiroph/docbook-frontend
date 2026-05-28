@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const SPECIALTIES = [
@@ -54,20 +54,29 @@ useEffect(() => {
   fetchDoctors();
 }, [selectedSpecialty]);
 
-  const fetchDoctors = async () => {
-    setLoading(true);
-    try {
-      const params = {};
-      if (selectedSpecialty !== "all") params.specialty = selectedSpecialty;
-      if (search) params.search = search;
-      const res = await axios.get("http://localhost:5000/api/doctors", { params });
-      setDoctors(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+const fetchDoctors = async () => {
+  setLoading(true);
+
+  try {
+    const params = {};
+
+    if (selectedSpecialty !== "all") {
+      params.specialty = selectedSpecialty;
     }
-  };
+
+    if (search) {
+      params.search = search;
+    }
+
+    const res = await API.get("/doctors", { params });
+
+    setDoctors(res.data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSearch = (e) => {
     e.preventDefault();

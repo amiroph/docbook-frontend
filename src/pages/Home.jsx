@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const NAV_LINKS = ["Home", "Doctors", "Services", "About", "Contact"];
@@ -34,8 +34,7 @@ export default function Home() {
   const [stats, setStats] = useState({ doctors: 0, patients: 0, specialties: 0 });
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/stats")
+    API.get("/stats")
       .then((res) => setStats(res.data))
       .catch((err) => console.error(err));
   }, []);

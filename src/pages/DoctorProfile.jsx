@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 function StarRating({ rating }) {
@@ -92,13 +92,15 @@ export default function DoctorProfile() {
 
   const fetchCompletedAppts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/appointments/my", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await API.get("/appointments/my");
+  
       // Filter completed appointments for this doctor
       const completed = res.data.filter(
-        (a) => a.status === "completed" && String(a.doctor_user_id) === String(id)
+        (a) =>
+          a.status === "completed" &&
+          String(a.doctor_user_id) === String(id)
       );
+  
       setCompletedAppts(completed);
     } catch (err) {
       console.error(err);

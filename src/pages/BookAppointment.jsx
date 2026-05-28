@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const TIME_SLOTS = [
@@ -61,7 +61,7 @@ export default function BookAppointment() {
 
   const fetchDoctor = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/doctors/${id}`);
+      const res = await API.get(`/doctors/${id}`);
       setDoctor(res.data);
     } catch (err) {
       console.error(err);
@@ -72,9 +72,13 @@ export default function BookAppointment() {
 
   const fetchBookedSlots = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/appointments/booked-slots", {
-        params: { doctor_id: doctor.doctor_id, date: formatDate(selectedDate) },
+      const res = await API.get("/appointments/booked-slots", {
+        params: {
+          doctor_id: doctor.doctor_id,
+          date: formatDate(selectedDate),
+        },
       });
+  
       setBookedSlots(res.data.map((t) => t.slice(0, 5)));
     } catch (err) {
       console.error(err);

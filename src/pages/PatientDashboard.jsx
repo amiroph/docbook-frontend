@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const STATUS_STYLES = {
@@ -24,10 +24,7 @@ export default function PatientDashboard() {
 
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/appointments/my", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await API.get("/appointments/my");
       setAppointments(res.data);
     } catch (err) {
       console.error(err);
@@ -38,16 +35,16 @@ export default function PatientDashboard() {
 
   const handleCancel = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+  
     setCancelling(id);
+  
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/appointments/${id}/cancel`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.put(`/appointments/${id}/cancel`, {});
+  
       setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: "cancelled" } : a))
+        prev.map((a) =>
+          a.id === id ? { ...a, status: "cancelled" } : a
+        )
       );
     } catch (err) {
       alert(err.response?.data?.message || "Failed to cancel.");

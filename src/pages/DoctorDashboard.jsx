@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const STATUS_STYLES = {
@@ -36,9 +36,9 @@ export default function DoctorDashboard() {
   const fetchAll = async () => {
     try {
       const [apptRes, profileRes, availRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/doctor/appointments", { headers }),
-        axios.get("http://localhost:5000/api/doctor/profile", { headers }),
-        axios.get("http://localhost:5000/api/doctor/availability", { headers }),
+        API.get("/doctor/appointments"),
+        API.get("/doctor/profile"),
+        API.get("/doctor/availability"),
       ]);
       setAppointments(apptRes.data);
       setProfile(profileRes.data);
@@ -52,12 +52,10 @@ export default function DoctorDashboard() {
 
   const updateStatus = async (id, status) => {
     setUpdatingId(id);
+  
     try {
-      await axios.put(
-        `http://localhost:5000/api/doctor/appointments/${id}/status`,
-        { status },
-        { headers }
-      );
+      await API.put(`/doctor/appointments/${id}/status`, { status });
+  
       setAppointments((prev) =>
         prev.map((a) => (a.id === id ? { ...a, status } : a))
       );
@@ -88,12 +86,10 @@ export default function DoctorDashboard() {
   const saveAvailability = async () => {
     setAvailSaving(true);
     setAvailMsg("");
+  
     try {
-      await axios.post(
-        "http://localhost:5000/api/doctor/availability",
-        { availability },
-        { headers }
-      );
+      await API.post("/doctor/availability", { availability });
+  
       setAvailMsg("✅ Availability saved successfully!");
     } catch (err) {
       setAvailMsg("❌ Failed to save availability.");

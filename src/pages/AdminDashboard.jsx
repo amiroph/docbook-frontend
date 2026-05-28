@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../utils/api";
 import { useAuth } from "../context/AuthContext";
 
 const STATUS_STYLES = {
@@ -32,10 +32,10 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const [statsRes, doctorsRes, patientsRes, apptsRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/admin/stats", { headers }),
-        axios.get("http://localhost:5000/api/admin/doctors", { headers }),
-        axios.get("http://localhost:5000/api/admin/patients", { headers }),
-        axios.get("http://localhost:5000/api/admin/appointments", { headers }),
+        API.get("/admin/stats"),
+        API.get("/admin/doctors"),
+        API.get("/admin/patients"),
+        API.get("/admin/appointments"),
       ]);
       setStats(statsRes.data);
       setDoctors(doctorsRes.data);
