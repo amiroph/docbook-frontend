@@ -72,7 +72,7 @@ export default function DoctorProfile() {
 
   const fetchDoctor = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/doctors/${id}`);
+      const res = await API.get(`/doctors/${id}`);
       setDoctor(res.data);
     } catch (err) {
       console.error(err);
@@ -83,7 +83,7 @@ export default function DoctorProfile() {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/reviews/${id}`);
+      const res = await API.get(`/reviews/${id}`);
       setReviews(res.data);
     } catch (err) {
       console.error(err);
@@ -110,19 +110,17 @@ export default function DoctorProfile() {
   const handleReviewSubmit = async () => {
     if (!rating) return setReviewError("Please select a rating.");
     if (!selectedAppt) return setReviewError("Please select an appointment.");
+  
     setReviewError("");
     setSubmitting(true);
+  
     try {
-      await axios.post(
-        "http://localhost:5000/api/reviews",
-        {
-          doctor_id: doctor.doctor_id,
-          appointment_id: selectedAppt,
-          rating,
-          comment,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.post("/reviews", {
+        doctor_id: doctor.doctor_id,
+        appointment_id: selectedAppt,
+        rating,
+        comment,
+      });
       setReviewMsg("✅ Review submitted! Thank you.");
       setShowReviewForm(false);
       setRating(0);

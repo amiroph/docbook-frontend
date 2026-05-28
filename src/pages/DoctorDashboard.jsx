@@ -26,8 +26,7 @@ export default function DoctorDashboard() {
   const [availSaving, setAvailSaving] = useState(false);
   const [availMsg, setAvailMsg] = useState("");
 
-  const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+
 
   useEffect(() => {
     fetchAll();

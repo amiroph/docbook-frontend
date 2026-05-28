@@ -21,8 +21,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
 
-  const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+
 
   useEffect(() => {
     fetchAll();
@@ -50,11 +49,7 @@ export default function AdminDashboard() {
 
   const handleApprove = async (doctorId, approve) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/admin/doctors/${doctorId}/approve`,
-        { approve },
-        { headers }
-      );
+      await API.put(`/admin/doctors/${doctorId}/approve`, { approve });
       setDoctors((prev) =>
         prev.map((d) => d.doctor_id === doctorId ? { ...d, is_approved: approve } : d)
       );
@@ -70,11 +65,7 @@ export default function AdminDashboard() {
 
   const handleToggleUser = async (userId) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/admin/users/${userId}/toggle`,
-        {},
-        { headers }
-      );
+      await API.put(`/admin/users/${userId}/toggle`, {});
       setPatients((prev) =>
         prev.map((p) => p.id === userId ? { ...p, is_active: !p.is_active } : p)
       );

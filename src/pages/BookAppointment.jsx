@@ -73,10 +73,7 @@ export default function BookAppointment() {
   const fetchBookedSlots = async () => {
     try {
       const res = await API.get("/appointments/booked-slots", {
-        params: {
-          doctor_id: doctor.doctor_id,
-          date: formatDate(selectedDate),
-        },
+        params: { doctor_id: doctor.doctor_id, date: formatDate(selectedDate) },
       });
   
       setBookedSlots(res.data.map((t) => t.slice(0, 5)));
@@ -108,17 +105,12 @@ export default function BookAppointment() {
     setError("");
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/appointments/book",
-        {
-          doctor_id: id,
-          appointment_date: formatDate(selectedDate),
-          appointment_time: selectedTime,
-          reason,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await API.post("/appointments/book", {
+        doctor_id: id,
+        appointment_date: formatDate(selectedDate),
+        appointment_time: selectedTime,
+        reason,
+      });
       setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.message || "Booking failed. Please try again.");
